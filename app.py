@@ -1,8 +1,18 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from textblob import TextBlob
 
 app = FastAPI()
+
+# Tambahkan Middleware CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Ganti dengan domain frontend Anda
+    allow_credentials=True,
+    allow_methods=["*"],  # Mengizinkan semua metode (GET, POST, dll.)
+    allow_headers=["*"],  # Mengizinkan semua header
+)
 
 class QueryRequest(BaseModel):
     query: str
