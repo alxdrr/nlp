@@ -1,29 +1,28 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from textblob import TextBlob
+from flask import Flask,request ,jsonify
+from flask_cors import CORS
+import pandas as pd
 
-app = FastAPI()
+app = Flask(__name__)
+cors = CORS(app, origins="*")
+data = pd.read_csv("tracksdata.csv")
+data['artists'] = data['artists'].str.lower()
 
-# Tambahkan Middleware CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Ganti dengan domain frontend Anda
-    allow_credentials=True,
-    allow_methods=["*"],  # Mengizinkan semua metode (GET, POST, dll.)
-    allow_headers=["*"],  # Mengizinkan semua header
-)
+@app.route("/api/users", methods=["POST"])
+def search():
+    query = request.json.get('query', '').lower()
+    artists_list = set()
 
-class QueryRequest(BaseModel):
-    query: str
+    for artists in data['artists']:
+        if isinstance(artists, str):  # Pastikan artists adalah string
+            for artist in artists.split(';'):  # Pisahkan artis berdasarkan ';'
+                artist = artist.strip()  # Hilangkan spasi
+                if query in artist:  # Cek apakah query ada dalam nama artis
+                    artists_list.add(artist)  # Tambahkan ke set jika cocok
 
-@app.post("/analyze-sentiment/")
-def analyze_sentiment(request: QueryRequest):
-    query = request.query
-    sentiment = TextBlob(query).sentiment.polarity
-    mood = "neutral"
-    if sentiment < -0.2:
-        mood = "sad"
-    elif sentiment > 0.2:
-        mood = "happy"
-    return {"query": query, "sentiment": sentiment, "mood": mood}
+    print(artists_list)
+    return jsonify({
+        "artists": list(artists_list)  # Mengembalikan daftar artis dalam format JSON
+    })
+
+if __name__ == "__main__":
+    app.run(debug=True, port=8000)
