@@ -1,27 +1,34 @@
 from flask import Flask,request ,jsonify
 from flask_cors import CORS
 import pandas as pd
+from rapidfuzz import process, fuzz
 
 app = Flask(__name__)
 cors = CORS(app, origins="*")
 data = pd.read_csv("tracksdata.csv")
-data['artists'] = data['artists'].str.lower()
+data['track_name'] = data['track_name']
 
 @app.route("/api/users", methods=["POST"])
 def search():
-    query = request.json.get('query', '').lower()
-    artists_list = set()
+    query = request.json.get('query', '')
+    track_list = set()
 
-    for artists in data['artists']:
-        if isinstance(artists, str):  # Pastikan artists adalah string
-            for artist in artists.split(';'):  # Pisahkan artis berdasarkan ';'
-                artist = artist.strip()  # Hilangkan spasi
-                if query in artist:  # Cek apakah query ada dalam nama artis
-                    artists_list.add(artist)  # Tambahkan ke set jika cocok
+    all_tracks = []
+    for tracks in data['track_name']:
+        if isinstance(tracks, str):  # Pastikan tracks adalah string
+            all_tracks.extend(track.strip() for track in tracks.split(';'))
 
-    print(artists_list)
+    # Menggunakan RapidFuzz untuk melakukan fuzzy matching
+    matches = process.extract(query, all_tracks, limit=10, scorer=fuzz.partial_token_sort_ratio)  # Mencari hingga 10 hasil teratas
+
+    for match in matches:
+        track_name, score, _ = match
+        if score >= 50:  # Ambil hasil dengan skor di atas threshold (misalnya 70)
+            track_list.add(track_name)
+
+    print(track_list)
     return jsonify({
-        "artists": list(artists_list)  # Mengembalikan daftar artis dalam format JSON
+        "tracks": list(track_list)  # Mengembalikan daftar artis dalam format JSON
     })
 
 if __name__ == "__main__":
