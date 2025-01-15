@@ -9,7 +9,7 @@ import os
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
-cors = CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "http://localhost:5173", "supports_credentials": True}})
+cors = CORS(app, supports_credentials=True, resources={r"/*": {"origins": "http://localhost:5173", "supports_credentials": True}})
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1234@localhost:3306/sonata'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -187,6 +187,6 @@ def get_song_story():
         return jsonify({'error': str(e)}), 500
 
 if __name__ == "__main__":
-    with app.app_context():
-        db.create_all()  # Membuat tabel berdasarkan model
+    # with app.app_context():
+    #     db.create_all()  # Membuat tabel berdasarkan model
     app.run(debug=True, port=8000)
