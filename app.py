@@ -6,6 +6,7 @@ import openai
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
 import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.urandom(24)
@@ -16,7 +17,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Konfigurasi OpenAI API Key
-openai.api_key = "k-proj-r4AqCySYyfqbIjonEJplZPAoKHy4Mx7On2noG0V8LLNrCQpwzJChI0KYE1720dwySrRFd4_JODT3BlbkFJwmautHTXSy8o7fg7l7kw8VaUdojQmqEsUYJ8OPEg7Qhsa0dAekpILMwBavHrAQkVUqaJhvlDYA"
+load_dotenv()
+openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Membaca data dari CSV
 data = pd.read_csv("tracksdata.csv")
