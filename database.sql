@@ -7,13 +7,13 @@ CREATE TABLE user (
     date_of_birth DATE,
     gender VARCHAR(20),
     profile_iamge VARCHAR(99),
-    password VARCHAR(100)
+    password VARCHAR()
 );
 
 CREATE TABLE playlist (
     playlist_id INT PRIMARY KEY AUTO_INCREMENT,
     user_email VARCHAR(50),
-    playlist_name VARCHAR(100),
+    playlist_name VARCHAR(100),user
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_email) REFERENCES user(email)

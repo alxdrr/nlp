@@ -5,9 +5,11 @@ from rapidfuzz import process, fuzz
 import openai
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import check_password_hash, generate_password_hash
+import os
 
 app = Flask(__name__)
-cors = CORS(app, resources={r"/api/*": {"origins": "http://localhost:5173", "supports_credentials": True}})
+app.config['SECRET_KEY'] = os.urandom(24)
+cors = CORS(app, supports_credentials=True, resources={r"/api/*": {"origins": "http://localhost:5173", "supports_credentials": True}})
 app.config['CORS_HEADERS'] = 'Content-Type'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:1234@localhost:3306/sonata'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -84,7 +86,8 @@ def create_user():
         return jsonify({"message": "User created successfully!"}), 201
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-@app.route("/login", methods=["POST"])
+
+@app.route("/api/users/login", methods=["POST"])
 def login_user():
     data = request.json
     email = data.get("email")
