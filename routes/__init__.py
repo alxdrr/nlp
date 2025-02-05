@@ -6,6 +6,6 @@ from .story import story_bp
 
 def register_routes(app):
     app.register_blueprint(auth_bp, url_prefix="/api/users")
-    app.register_blueprint(playlist_bp, url_prefix="/api/playlists")
+    app.register_blueprint(playlist_bp, url_prefix="/api/playlist")
     app.register_blueprint(search_bp, url_prefix="/api/search")
     app.register_blueprint(story_bp, url_prefix="/api")
